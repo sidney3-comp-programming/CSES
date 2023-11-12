@@ -1,0 +1,60 @@
+SEARCHER CLASS:
+
+Search Functionality that you already have
+
+List<bool> evaluateRows(condition){
+    /*
+    "White" in some column
+    */
+
+    return True / False
+}
+
+
+
+BOOLEAN EVALUATOR
+
+D = (A OR B)
+
+D AND C
+
+
+((A AND B) OR (C AND A)) AND D
+
+(A AND B)
+
+evaluate(A AND B)
+
+A 
+AND
+B
+
+(A AND B)
+
+OR
+
+(C AND A)
+
+
+function evaluate(boolean statement){ (A OR B) AND (C)
+    Two cases for the boolean statement
+
+    Case 1: base case (A):
+        We query SEARCHER
+
+    Case 2: a complex operation:
+        SPLIT BY PARENTHESES GROUPS
+        WE RETURN evaluate(A OR B) AND evaluate(C)
+
+
+}
+
+
+
+(IPEDS RACE is (White OR asian)) AND (university is brown university)
+
+A = white == IPEDS Race
+B  = Asian == IPEDS Race
+C = University == Brown University
+
+(A OR B) AND (C)
