@@ -26,7 +26,25 @@ What changes?
 
 */
 void solve(){
-    
+    int n;
+    see(n);
+    vii books1(n);
+    for(int i=0;i<n;i++)
+        int x; see(x);
+        books[i]=mp(i,x);
+    vii books2(books1);
+    sort(all(books1), [](const ii&a, const ii&b){return a.S < b.S});
+    sort(all(books2), [](const ii&a, const ii&b){return a.S > b.S});
+    int b1_rem = books1.back(), b2_rem=books2.back();
+    ll res = 0;
+    while(!books1.empty() && !books2.empty()){
+        if(books1.back().F != books2.back().F){
+
+        }
+        else{
+            
+        }
+    }
 }
 
 int32_t main(){

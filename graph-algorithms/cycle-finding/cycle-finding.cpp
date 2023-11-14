@@ -22,66 +22,60 @@ void putl(T&&... args) { ((cout << args << "\n"), ...);}
 #define debug(x) cout << #x << ": " << x << endl;
 #define int long long
 
-const ll inf = LLONG_MAX;
+const ll inf = 1LL<62;
 const ld ep = 0.0000001;
 const ld pi = acos(-1.0);
 const ll md = 1000000007;
 
-const int MAX_NODES = 2501;
-const int WHITE=1,GREY=2,BLACK=3;
+const int MAX_NODES = 2501, MAX_EDGES = 5001;
 
-int state[MAX_NODES];
-int   dis[MAX_NODES];
-vii   adj[MAX_NODES];
-
-vi curr_path;
-bool printed = false;
-
-void dfs(int curr_node, int path_sum){
-    if(printed)
-        return;
-    
-    state[curr_node] = GREY;
-    dis  [curr_node] = path_sum;
-    curr_path.pb(curr_node);
-
-    for(auto [next, edge_weight] : adj[curr_node]){
-        if(state[next] == GREY && path_sum + edge_weight < dis[next]){
-            printed = true;
-            putl("YES");
-            int cycle_start = -1;
-            for(int i=0;i<curr_path.sz();i++)
-                if(curr_path[i] == next)
-                    cycle_start=i;
-            for(int j=cycle_start;j<curr_path.sz();j++)
-                cout << curr_path[j] << " ";
-            cout << next << " ";
-        }
-        else if(state[next] == WHITE){
-            dfs(next, path_sum + edge_weight);
-        }
-    }
-
-    state[curr_node] = BLACK;
-    curr_path.pop_back();
-}
+int dis[MAX_NODES];
+int par[MAX_NODES];
 
 void solve(){
     int n,m;
     see(n,m);
+
+    vector<tuple<int,int,int>> edges;
     for(int i=0;i<m;i++){
         int s,t,w;
         see(s,t,w);
-        adj[s].pb(mp(t,w));
+        edges.pb({s,t,w});
     }
-   
-    for(int i=1;i<=n;i++){
-        fill(begin(state), end(state), WHITE);
-        fill(begin(dis), end(dis), inf);     
-        dfs(i, 0);
+    fill(begin(dis), end(dis), inf);
+    fill(begin(par), end(par), -1);
+
+    dis[1]=0;
+    int f;
+    for(int i=0;i<n+1;i++){
+        f = 0;
+        for(auto [s,t,w] : edges){
+            if(dis[s] + w < dis[t]){
+                f = t;
+                par[t]=s;
+                dis[t]=w+dis[s];
+            }
+        }
     }
-    if(!printed)
+    if(!f){
         putl("NO");
+        return;
+    }
+    putl("YES");
+    vi  cyc;
+    int curr = f;
+    for(int i=0;i<n;i++)f=par[f];
+    for(int x=f;;x=par[x]){
+        cyc.pb(x);
+        if(x==f && cyc.sz()>1)
+            break;
+    }
+            
+    for(int j=cyc.sz()-1;j>=0;j--)
+        cout << cyc[j] << " ";
+        return;
+        
+
 }
 
 int32_t main(){
