@@ -28,28 +28,52 @@ const ld ep = 0.0000001;
 const ld pi = acos(-1.0);
 const ll md = 1000000007;
 
-int dp[201][2000001];
-void solve(){
-    int n,x;
-    see(n,x);
-    vi coins(n,0);
-    rep(i,0,n){
-        cin>>coins[i];
+void build(vi& T, vi& arr, int v, int tl, int tr)
+{
+    if(tl == tr)
+    {
+        T[v] = arr[tl-1];
+        return;
     }
-    dp[0][0]=1;
-    rep(coin,1,n+1){
-        rep(cost,0,x+1){
-            dp[coin][cost]=dp[coin-1][cost];
-            if(coins[coin-1] <= cost){
-                dp[coin][cost]+=dp[coin][cost-coins[coin-1]];
-            }
-            dp[coin][cost]%=md;
-        }
+    int m = (tl + tr)/2;
+    build(T, arr, 2*v, tl, m);
+    build(T, arr, 2*v + 1, m+1, tr);
+    T[v] = min(T[2*v], T[2*v + 1]);
+}
+int query(vi& T, int v, int tl, int tr, int l, int r)
+{
+    if(tl == l && tr == r)
+    {
+        return T[v];
     }
-    putl(dp[n][x]);
+    if(l > r)
+    {
+        return inf; 
+    }
+    int m = (tl+tr)/2;
+    return min(query(T, 2*v, tl, m, l, min(r, m)), query(T, 2*v+1, m+1,tr,max(l,m+1), r));
+}
+void solve()
+{
+    int n,q;
+    see(n,q);
+    vi arr(n);
+    rep(i,0,n)
+    {
+        cin >> arr[i];
+    }
+    vi T(4*n);
+    build(T,arr,1,1,n);
+    rep(i,0,q)
+    {
+        int a,b;
+        see(a,b);
+        cout << query(T, 1, 1, n, a, b) << "\n";
+    }   
 }
 
-int32_t main(){
+int32_t main()
+{
     ios::sync_with_stdio(0); cin.tie(0);
     solve();
 }

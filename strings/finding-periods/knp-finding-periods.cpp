@@ -21,32 +21,54 @@ void putl(T&&... args) { ((cout << args << "\n"), ...);}
 #define all(v) (v).begin(), (v).end()
 #define sz size
 #define debug(x) cout << #x << ": " << x << endl;
-#define int long long
 
 const ll inf = LLONG_MAX;
 const ld ep = 0.0000001;
 const ld pi = acos(-1.0);
 const ll md = 1000000007;
 
-int dp[201][2000001];
+
 void solve(){
-    int n,x;
-    see(n,x);
-    vi coins(n,0);
-    rep(i,0,n){
-        cin>>coins[i];
-    }
-    dp[0][0]=1;
-    rep(coin,1,n+1){
-        rep(cost,0,x+1){
-            dp[coin][cost]=dp[coin-1][cost];
-            if(coins[coin-1] <= cost){
-                dp[coin][cost]+=dp[coin][cost-coins[coin-1]];
+    string S;
+    see(S);
+    int n=S.sz();
+    vi Z(n);
+    int L=0,R=0;
+    Z[0]=n;
+    rep(i,1,n){
+        if(R <= i){
+            L=R=i;
+            while(R<n && S[R]==S[R-L]){
+                R++;
             }
-            dp[coin][cost]%=md;
+            R--;
+            Z[i]=R-L+1;
+        }
+        else{
+            int k=i-L;
+            if(Z[k] < R - i){
+                Z[i]=Z[k];
+            }
+            else{
+                L=i;
+                while(R<n && S[R]==S[R-L]){
+                    R++;
+                }
+                R--;
+                Z[i]=R-L+1;
+            }
         }
     }
-    putl(dp[n][x]);
+    bool can_make;
+    for(int s_len=1;s_len<=n;s_len++){
+        can_make=true;
+        for(int k=0; k<n && can_make; k += s_len){
+            can_make=can_make && (Z[k]>=min(s_len,n-k));
+        }
+        if(can_make){
+            printf("%d ",s_len);
+        }
+    }
 }
 
 int32_t main(){

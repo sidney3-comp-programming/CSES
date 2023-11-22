@@ -35,8 +35,8 @@ void solve()
 
     vi Z(M.size());
     int L, R, k;
-    int N = M.size()
-                L = R = 0;
+    int N = M.size();
+    L = R = 0;
     Z[0] = M.size();
     for (int i = 1; i < N; i++)
     {

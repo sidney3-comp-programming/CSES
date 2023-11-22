@@ -28,28 +28,24 @@ const ld ep = 0.0000001;
 const ld pi = acos(-1.0);
 const ll md = 1000000007;
 
-int dp[201][2000001];
+/*
+We want to make some sort of trie structure: have a node A that maps to several other letters...
+The problem with having one node for every letter -> hard to avoid self loops...
+
+LOVE the idea of having a node for each letter. Makes it so easy to compute the best path. Start
+at the best letter -> take the best path.
+MAYBE we can make some constant time way of checking if a given string is a subset of a rotation of the main string?
+hashing approach... Can we come up with that? Oh actually -> we should just compute the hash codes and take
+the minimum of them. Very natural way to do it. With Robin Karp! Mehhhh. Can't really compare - not meant for that
+
+*/
 void solve(){
-    int n,x;
-    see(n,x);
-    vi coins(n,0);
-    rep(i,0,n){
-        cin>>coins[i];
-    }
-    dp[0][0]=1;
-    rep(coin,1,n+1){
-        rep(cost,0,x+1){
-            dp[coin][cost]=dp[coin-1][cost];
-            if(coins[coin-1] <= cost){
-                dp[coin][cost]+=dp[coin][cost-coins[coin-1]];
-            }
-            dp[coin][cost]%=md;
-        }
-    }
-    putl(dp[n][x]);
 }
 
 int32_t main(){
     ios::sync_with_stdio(0); cin.tie(0);
-    solve();
+    int t;
+    see(t);
+    while(t--)
+        solve();
 }
