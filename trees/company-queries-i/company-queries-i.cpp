@@ -1,51 +1,71 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int parent[200001];
-int ancestor[33][2000001];
-/*
-Want a node --> level mapping and similarly a
-level ---> node...
+template<typename... T>
+void see(T&... args) { ((cin >> args), ...);}
+template<typename... T>
+void put(T&&... args) { ((cout << args << " "), ...);}
+template<typename... T>
+void putl(T&&... args) { ((cout << args << "\n"), ...);}
+#define ll long long
+#define ld long double
+#define ii pair<int, int>
+#define vi vector<int>
+#define vii vector<ii>
+#define vec vector
+#define rep(i,a,b) for(int i = a; i < b; i++)
+#define pb push_back
+#define mp make_pair
+#define F first
+#define S second
+#define all(v) (v).begin(), (v).end()
+#define sz size
+#define debug(x) cout << #x << ": " << x << endl;
 
-Not really helpful? 
-
-*/
-int main(){
-    parent[0] = 1;
-    int n, q;
-    cin >> n >> q;
-    for(int i = 1; i < n; i++){
+void solve()
+{
+    int n,q;
+    see(n,q);
+    vi parent(n+1);
+    rep(i,2,n+1)
+    {
         cin >> parent[i];
     }
-    parent[0] = -1;
-    for(int node = 0; node < n; node++){
-        int currOffset = 1;
-        int currNode = node;
-        for(level = 1; level < floor(log2(n)); level++){
-            if(currNode == -1 || parent[currNode - 1] == -1){
-                currNode = -1;
-            }
-            if(level == 1<<currOffset){
-                ancestor[currOffset][node] = currNode;
-                currOffset++;
-            }
+    vec<vi> jump_table(n+1, vi(25, 0));
+    rep(i,1,n + 1)
+    {
+        jump_table[i][0] = parent[i]; 
+    }
+    rep(p,1,25)
+    {
+        rep(i,1,n + 1)
+        {
+            jump_table[i][p] = jump_table[jump_table[i][p-1]][p-1];
         }
     }
+    auto jump_fn = [](const vec<vi>& jump_table, int curr, int steps)
+    {
+        int res = curr;
+        rep(p,0,25)
+        {
+            if((1<<p)&steps)
+            {
+                res = jump_table[res][p];
+            }
+        }
+        return res;
+    };
+    rep(j,0,q)
+    {
+        int source, steps;
+        see(source, steps);
+        int steps_parent = jump_fn(jump_table, source, steps);
+        cout << ((steps_parent == 0) ? -1 : (steps_parent)) << "\n";
+    }
+}
 
-    int node, levels;
-    while(q--){
-        cin >> node >> levels;
-        int curr = node;
-        bool printed = false;
-        for(int j = 0; j < levels; j++){
-            if(parent[curr - 1] == -1){
-                cout << -1 << endl;
-                printed = true;
-                break;
-            }
-            curr = parent[curr - 1];
-        }
-        if(!printed)
-        cout << curr << endl;
-    }
+int32_t main()
+{
+    ios::sync_with_stdio(0); cin.tie(0);
+    solve();
 }
