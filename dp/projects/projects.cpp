@@ -1,45 +1,77 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int dp[200001];
+template<typename... T>
+void see(T&... args) { ((cin >> args), ...);}
+template<typename... T>
+void put(T&&... args) { ((cout << args << " "), ...);}
+template<typename... T>
+void putl(T&&... args) { ((cout << args << "\n"), ...);}
+#define ll long long
+#define ld long double
+#define ii pair<int, int>
+#define vi vector<int>
+#define vii vector<ii>
+#define vec vector
+#define rep(i,a,b) for(int i = a; i < b; i++)
+#define f0r(i,a) for(int i = 0; i < a; i++)
+#define r0f(i,a) for(int i = a - 1; i >= 0; i--)
+#define pb push_back
+#define mp make_pair
+#define F first
+#define S second
+#define all(v) (v).begin(), (v).end()
+#define sz size
+#define debug(x) cout << #x << ": " << x << endl;
+#define int long long
 
-bool cmp(vector<int> a, vector<int> b){
-    return (a[1] <= b[1]);
+const ll inf = LLONG_MAX;
+const ld ep = 0.0000001;
+const ld pi = acos(-1.0);
+const ll md = 1000000007;
+const int BIG = (INT_MAX-1)/2;
+
+void solve()
+{
+    int n;
+    see(n);
+    vec<array<int,3>> projects(n);
+    f0r(i,n)
+    {
+        int start, end, reward;
+        see(start, end, reward);
+        projects[i] = {start, end, reward};
+    }
+    sort(all(projects), [](const array<int,3>& a, const array<int,3>& b){
+        return a[1] < b[1];
+    });
+    vi dp(n);
+    dp[0] = projects[0][2];
+    rep(i, 1, n)
+    {
+        auto [start, end, reward] = projects[i];
+        dp[i] = dp[i-1];
+        int l = 0, r = i, found = 0;
+        while(l <= r)
+        {
+            int m = (l+r)/2;
+            if(start > projects[m][1])   
+            {
+                found = m;
+                l = m + 1;
+            }
+            else
+            {
+                r = m - 1;
+            }
+        }
+        dp[i] = max(dp[i], reward + ((found>0) ? dp[found-1] : 0));
+    }
+    putl(dp.back());
 }
 
-int main(){
-    int n;
-    cin >> n;
-    vector<vector<int>> intervals;
-    
-    int start, end, weight;
-
-    for(int i = 0; i < n; i++){
-        cin >> start >> end >> weight;
-        intervals.push_back({start, end, weight})
-    }
-    sort(intervals.begin(), intervals.end(), cmp);
-    dp[0] = intervals[0][2];
-    int res = dp[0];
-    set<pair<int, int>> starts;
-    starts.add(make_pair(2, 3));
-    starts.add(make_pair(3,4));
-    cout << lower_bound(starts.begin(), starts.end(), 2)->first << endl;
-    cout << lower_bound(starts.begin(), starts.end(), 1)->first << endl;
-
-    // for(vector<int> s : starts){
-    //     cout << s[0] << "," << s[1] << "," << s[2] << endl;
-    // }
-    // for(int i = 1; i < n; i++){
-    //     int lb = lower_bound(starts, ends[i][1]);
-    //     cout << "curr end: " << ends[i][1] << "lower bound bound: " << lb << endl;
-    //     if(lb == -1){
-    //         dp[i] = max(dp[i - 1], ends[i][2]);
-    //     }
-    //     else{
-    //         dp[i] = max(dp[i-1], ends[i][2] + dp[lb]);
-    //     }
-    //     res = max(res, dp[i]);
-    // }
-    // cout << res << endl;
+int32_t main()
+{
+    ios::sync_with_stdio(0); cin.tie(0);
+    solve();
 }

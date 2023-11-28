@@ -14,6 +14,8 @@ void putl(T&&... args) { ((cout << args << "\n"), ...);}
 #define vii vector<ii>
 #define vec vector
 #define rep(i,a,b) for(int i = a; i < b; i++)
+#define f0r(i,a) for(int i = 0; i < a; i++)
+#define r0f(i,a) for(int i = a; i >= 0; i--)
 #define pb push_back
 #define mp make_pair
 #define F first
@@ -29,41 +31,42 @@ const ll md = 1000000007;
 const int BIG = (INT_MAX-1)/2;
 
 /*
-dp(i,j) := the maximum number of pages we can buy with $i and books[0:j]
-dp(0,0) = 0
+say dp(i,j) = the number of changes required to make s[i:], t[j:] equal.
 
-dp(i,j) = max(dp(i, j - 1), dp(i - price[j], j))
+Then we have a few choices:
+delete the ith character from either. And that is functionally the same as adding the other. If they are equal we can differ up.
+
 */
-const int MAX_BUDGET = 100001;
 void solve()
 {
-    int n,x;
-    see(n,x);
-    vi price(n);
-    vi pages(n);
-    rep(i,0,n)
+    string s, t;
+    see(s,t);
+    if(s.sz() < t.sz())
     {
-        cin >> price[i];
+        swap(s,t);
     }
-    rep(i,0,n)
+    int n = s.sz(), m = t.sz();
+    vec<vi> dp(n + 1, vi(m + 1, BIG));
+    f0r(i,n + 1)
     {
-        cin >> pages[i];
+        dp[i][m] = n - i;
     }
-    vi state(MAX_BUDGET, 0);
-    rep(i,0,n)
+    f0r(i,m + 1)
     {
-        vi new_state(MAX_BUDGET, 0);
-        rep(val, 1, x + 1)
+        dp[n][i] = m - i;
+    }
+    r0f(i,n - 1)
+    {
+        r0f(j,m - 1)
         {
-            new_state[val] = state[val];
-            if(price[i] <= val)
-            {
-                new_state[val] = max(new_state[val], state[val - price[i]] + pages[i]);
-            }
+           dp[i][j] = min({1 + dp[i + 1][j], 1 + dp[i][j + 1], 1 + dp[i + 1][j + 1]}); 
+           if(s[i] == t[j])
+           {
+               dp[i][j] = min(dp[i][j], dp[i+1][j+1]);
+           }
         }
-        state = new_state;
     }
-    putl(state[x]);
+    putl(dp[0][0]);
 }
 
 int32_t main()

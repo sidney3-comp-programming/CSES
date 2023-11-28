@@ -28,42 +28,48 @@ const ld pi = acos(-1.0);
 const ll md = 1000000007;
 const int BIG = (INT_MAX-1)/2;
 
-/*
-dp(i,j) := the maximum number of pages we can buy with $i and books[0:j]
-dp(0,0) = 0
-
-dp(i,j) = max(dp(i, j - 1), dp(i - price[j], j))
-*/
-const int MAX_BUDGET = 100001;
 void solve()
 {
-    int n,x;
-    see(n,x);
-    vi price(n);
-    vi pages(n);
+    const char TRAP = '*';
+    int n;
+    see(n);
+    vec<vec<bool>> grid(n, vec<bool>(n, true));
     rep(i,0,n)
     {
-        cin >> price[i];
-    }
-    rep(i,0,n)
-    {
-        cin >> pages[i];
-    }
-    vi state(MAX_BUDGET, 0);
-    rep(i,0,n)
-    {
-        vi new_state(MAX_BUDGET, 0);
-        rep(val, 1, x + 1)
+        rep(j,0,n)
         {
-            new_state[val] = state[val];
-            if(price[i] <= val)
-            {
-                new_state[val] = max(new_state[val], state[val - price[i]] + pages[i]);
-            }
+            char c;
+            cin >> c;
+            grid[i][j] = (c != TRAP);
         }
-        state = new_state;
     }
-    putl(state[x]);
+    vec<vi> dp(n, vi(n, 0));
+    if(!grid[0][0])
+    {
+        putl("0");
+        return;
+    }
+    dp[0][0] = 1;
+    rep(i, 0, n)
+    {
+        rep(j, 0, n)
+        {
+            if(!grid[i][j])
+            {
+                continue;
+            }
+            if(i > 0)
+            {
+                dp[i][j] += dp[i-1][j];
+            }
+            if(j > 0)
+            {
+                dp[i][j] += dp[i][j-1];
+            }
+            dp[i][j] %= md;
+        }
+    }
+    putl(dp[n-1][n-1]);
 }
 
 int32_t main()
