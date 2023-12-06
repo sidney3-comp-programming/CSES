@@ -24,77 +24,122 @@ void putl(T&&... args) { ((cout << args << "\n"), ...);}
 #define sz size
 #define debug(x) cout << #x << ": " << x << endl;
 
-const ll inf = LLONG_MAX;
-const ld ep = 0.0000001;
-const ld pi = acos(-1.0);
-const ll md = 1000000007;
-const int BIG = (INT_MAX-1)/2;
-
-void update(vi& T, int v, int tl, int tr, int l, int r, int x)
+class LowestCommonAncestor 
 {
-    if(tl == l && tr == r)
+public:
+    LowestCommonAncestor(const vec<vi>& _adj, const int& _num_nodes):
+        num_nodes(_num_nodes), jump_table(LOG, vi(_num_nodes + 1)), depth(_num_nodes + 1)
     {
-        T[v] += x;
-        return;
-    }
-    if(l > r)
-    {
-        return;
-    }
-    int tm = (tl+tr)/2;
-    update(T, 2*v, tl, tm, l, min(r, tm), x);
-    update(T, 2*v+1, tm+1, tr, max(l, tm+1), r, x);
-}
-int query(vi& T, int v, int tl, int tr, int i)
-{
-    if(tl == tr)
-    {
-        return T[v];
-    }
-    int tm = (tl + tr)/2;
-    if(i <= tm)
-    {
-        return T[v] + query(T, 2*v, tl, tm, i);     
-    }
-    else
-    {
-        return T[v] + query(T, 2*v+1, tm+1, tr, i);
-    }
-}
-void dfs(const vec<vi>& adj, vi& euler, vii& node_data, int curr, int prev)
-{
-    euler.pb(curr);
-    int euler_start = euler.sz() - 1;
-    for(int next : adj[curr])
-    {
-        if(next == prev)
+        __make_parent_depth(_adj, jump_table[0], depth, 1, 0, 0);
+        rep(pow,1,LOG)
         {
-            continue;
+            rep(i,1,_num_nodes + 1)
+            {
+                jump_table[pow][i] = jump_table[pow - 1][jump_table[pow-1][i]];
+            }
         }
-        dfs(adj, euler, node_data, next, curr);
     }
-    int euler_end = euler.sz() - 1;
-    node_data[curr] = mp(euler_start, euler_end);
-}
+    int operator()(int a, int b)
+    {
+        assert(1 <= min(a,b) && max(a,b) <= num_nodes);
+        if(depth[a] < depth[b])
+        {
+            swap(a,b);
+        }
+        a = jump(a, depth[a] - depth[b]);
+        if(a == b)
+        {
+            return a;
+        }
+        r0f(i,LOG - 1)
+        {
+            int aP = jump_table[i][a], bP = jump_table[i][b];
+            if(aP != bP)
+            {
+                a = aP;
+                b = bP;
+            }
+        }
+        return jump_table[0][a];
+    }
+private:
+    static constexpr int LOG = 25;
+    int num_nodes;
+    vi depth;
+    vec<vi> jump_table;
+    int jump(const int start_node, const int steps)
+    {
+        int cur = start_node;
+        f0r(i,LOG)
+        {
+            if((1<<i) & steps)
+            {
+                cur = jump_table[i][cur];
+            }
+        }
+        return cur;
+    }
+    void __make_parent_depth(const vec<vi>& adj, vi& parent, vi& depth, const int curr, const int prev, int curr_depth)
+    {
+        parent[curr] = prev;
+        depth[curr] = curr_depth;
+        for(const int next : adj[curr])
+        {
+            __make_parent_depth(adj, parent, depth, next, curr, curr_depth + 1);
+        }
+    }
+};
+class Euler
+{
+public:
+    Euler(const vec<vi>& adj, const int _num_nodes):
+        num_nodes(_num_nodes), tour_start(num_nodes + 1), tour_end(num_nodes + 1), cur_tour_len(0)
+    {
+        _dfs(adj, 1, 0);
+    }
+    int get_start(int node)
+    {
+        return tour_start[node];
+    }
+    int get_end(int node)
+    {
+        return tour_end[node];
+    }
+private:
+    void _dfs(const vec<vi>& adj, int cur, int prev)
+    {
+        cur_tour_len++;
+        tour_start[cur] = cur_tour_len - 1;
+        for(int next : adj[cur])
+        {
+            if(next == prev)
+            {
+                continue;
+            }
+            _dfs(adj, next, cur);
+        }
+        tour_end[cur] = cur_tour_len - 1;
+    }
+    int num_nodes;
+    int cur_tour_len;
+    vi tour_start;
+    vi tour_end;
+};
 void solve()
 {
     int n,m;
     see(n,m);
-    vii node_data;
-    vi euler;
-    vec<vi> adj(n+1);
-    f0r(i,n-1)
+    vec<vi> adj(n + 1);
+    f0r(_,n-1)
     {
         int s,t;
         see(s,t);
         adj[s].pb(t);
         adj[t].pb(s);
     }
-
-
-
+    LowestCommonAncestor lca(adj, n);
+    Euler e(adj, n);
 }
-
 int32_t main()
 {
     ios::sync_with_stdio(0); cin.tie(0);

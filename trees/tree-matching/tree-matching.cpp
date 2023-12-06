@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -7,6 +8,7 @@ template<typename... T>
 void put(T&&... args) { ((cout << args << " "), ...);}
 template<typename... T>
 void putl(T&&... args) { ((cout << args << "\n"), ...);}
+int ciel(int a, int b) {return ceil(static_cast<double>(a) / static_cast<double>(b));}
 #define ll long long
 #define ld long double
 #define ii pair<int, int>
@@ -14,6 +16,8 @@ void putl(T&&... args) { ((cout << args << "\n"), ...);}
 #define vii vector<ii>
 #define vec vector
 #define rep(i,a,b) for(int i = a; i < b; i++)
+#define f0r(i,a) for(int i = 0; i < a; i++)
+#define r0f(i,a) for(int i = a; i >= 0; i--)
 #define pb push_back
 #define mp make_pair
 #define F first
@@ -22,46 +26,64 @@ void putl(T&&... args) { ((cout << args << "\n"), ...);}
 #define sz size
 #define debug(x) cout << #x << ": " << x << endl;
 
+const string albet{"abcdefghijklmnopqrstuvwxyz"};
 const ll inf = LLONG_MAX;
 const ld ep = 0.0000001;
 const ld pi = acos(-1.0);
 const ll md = 1000000007;
 const int BIG = (INT_MAX-1)/2;
 
-ii dfs(vec<vi>& adj, int curr, int prev)
+/*
+    dp_1(v) := maximum matching on subtree of v assuming that we don't take any of the edges directory below v
+    dp_2(v) := maximum matching on subtree of v assuming we are allowed to take exactly one of the edges below v
+*/
+static constexpr int MAX_NODES = 200000;
+array<ii, MAX_NODES> dp;
+array<bool, MAX_NODES> ready;
+ii backtrack(const vec<vi>& adj, int curr_node, int prev)
 {
-    if(adj[curr].sz() == 1)
+    if(ready[curr_node])
     {
-        return make_pair(0, 1);
+        return dp[curr_node];
     }
-    int non_include_sum = 0;
-    int include_sum = 0;
-    vii child_collection;
-    for(int next : adj[curr])
+    int no_include = 0;
+    for(int child : adj[curr_node])
     {
-        if(next == prev)
+        if(child == prev)
         {
             continue;
         }
-        ii child_data = dfs(adj, next, curr);
-        non_include_sum += child_data.F;
-        include_sum += child_data.S;
+        no_include += backtrack(adj, child, curr_node).S; 
     }
-    return make_pair(include_sum, 1 + non_include_sum);
+    int include = 0;
+    for(int child : adj[curr_node])
+    {
+        if(child == prev)
+        {
+            continue;
+        }
+        ii child_data = backtrack(adj, child, curr_node);
+        include = max(include, no_include - child_data.S + child_data.F + 1);
+    }
+    ready[curr_node] = true;
+    ii res = mp(no_include, max(include, no_include));
+    dp[curr_node] = res;
+    return res;
 }
 void solve()
 {
     int n;
     see(n);
-    vec<vi> adj(n+1);
-    rep(i,0,n-1)
+    vec<vi> adj(n);
+    f0r(_,n-1)
     {
         int s,t;
         see(s,t);
+        adj[--t].pb(--s);
         adj[s].pb(t);
-        adj[t].pb(s);
     }
-    putl(dfs(adj, 1, 0).F);
+    fill(all(ready), false);
+    putl(max(backtrack(adj, 0, -1).F, backtrack(adj, 0, -1).S));
 }
 
 int32_t main()

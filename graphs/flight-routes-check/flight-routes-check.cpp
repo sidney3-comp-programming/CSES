@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -7,6 +8,7 @@ template<typename... T>
 void put(T&&... args) { ((cout << args << " "), ...);}
 template<typename... T>
 void putl(T&&... args) { ((cout << args << "\n"), ...);}
+int ciel(int a, int b) {return ceil(static_cast<double>(a) / static_cast<double>(b));}
 #define ll long long
 #define ld long double
 #define ii pair<int, int>
@@ -14,6 +16,8 @@ void putl(T&&... args) { ((cout << args << "\n"), ...);}
 #define vii vector<ii>
 #define vec vector
 #define rep(i,a,b) for(int i = a; i < b; i++)
+#define f0r(i,a) for(int i = 0; i < a; i++)
+#define r0f(i,a) for(int i = a; i >= 0; i--)
 #define pb push_back
 #define mp make_pair
 #define F first
@@ -22,100 +26,82 @@ void putl(T&&... args) { ((cout << args << "\n"), ...);}
 #define sz size
 #define debug(x) cout << #x << ": " << x << endl;
 
-const int UNVISITED=0,VISITING=1,VISITED_GOOD=2,VISITED_BAD=3;
+const string albet{"abcdefghijklmnopqrstuvwxyz"};
+const ll inf = LLONG_MAX;
+const ld ep = 0.0000001;
+const ld pi = acos(-1.0);
+const ll md = 1000000007;
+const int BIG = (INT_MAX-1)/2;
+/*
+    Lemma: we can travel between any two cities if and only if we can travel from every city to city 1
+    and from city 1 to every city.
 
-bool dfs(vec<int>& state, const vec<vi>& adj, int curr)
+    => Clear
+    <= Proof by contradiction 
+*/
+/*
+Returns 0 if 1 can map to all nodes, otherwise returns the node that 1 cannot map to
+*/
+int check_maps_to(const vec<vi>& adj, const int src, const int num_nodes)
 {
-    if(curr==1)
+    vec<bool> vis(num_nodes + 1, false);
+    vis[src] = true;
+    queue<int> q; 
+    q.push(src);
+    while(!q.empty())
     {
-        return true;
-    }
-    if(state[curr] != UNVISITED){
-        return state[curr] == VISITED_GOOD;
-    }
-    bool res=false;
-    for(int next : adj[curr])
-    {
-        if(state[next]==UNVISITED)
-        {
-            res=res||dfs(state,adj,next);
-        }
-        else if(state[next]!=VISITING)
-        {
-            res=res||(state[next]==VISITED_GOOD);
-        }
-    }
-    state[curr]=res?VISITED_GOOD : VISITED_BAD;
-    return res;
-
-}
-
-bool maps_from(vec<vi>& adj, ii& bad_pair, const int n)
-{
-    vec<int> state(n + 1, UNVISITED);
-   
-    for(int i=1;i<=n;i++)
-    {
-        if(!dfs(state,adj,i))
-        {
-            bad_pair.F=i;
-            bad_pair.S=1;
-            return false;
-        }
-    }
-    return true;
-}
-bool maps_to(vec<vi>& adj, ii& bad_pair, const int n){
-    queue<int> q;
-    q.push(1);
-    vec<bool> vis(n + 1, false);
-    vis[1]=true;
-    while(!q.empty()){
-        int curr=q.front();
+        int curr = q.front();
         q.pop();
-        for(int next : adj[curr])    
+        for(int next : adj[curr])
         {
-            if(!vis[next])
+            if(vis[next])
             {
-                vis[next]=true;
-                q.push(next);
+                continue;
             }
+            vis[next] = true;
+            q.push(next);
         }
     }
-    for(int i=1;i<=n;i++)   
+    for(int i = 1; i <= num_nodes; i++)
     {
         if(!vis[i])
         {
-            bad_pair.F=1;
-            bad_pair.S=i;
-            return false;
+            return i;
         }
     }
-    return true;
+    return 0;
 }
 
-void solve(){
-    int n,m;
+void solve()
+{
+    int n, m;
     see(n,m);
-    vec<vi> adj(n);
-    rep(i,0,n){
+    vec<vi> adj1(n + 1);
+    vec<vi> adj2(n + 1);
+    f0r(_,m)
+    {
         int s,t;
         see(s,t);
-        adj[s].pb(t);
+        adj1[s].pb(t);
+        adj2[t].pb(s);
     }
-    ii bad_pair;
-    if(!maps_to(adj,bad_pair,n) || !maps_from(adj, bad_pair,n))
+    int no_map_from;
+    if((no_map_from = check_maps_to(adj2, 1, n)))
     {
-        cout<<"NO\n"<<bad_pair.F<<" "<<bad_pair.S<<"\n";
-    }
-    else
-    {
-        cout<<"YES\n";
+        cout << "NO\n" << no_map_from << " " << 1 << "\n";
+        return;
     }
 
+    int no_map_to;
+    if((no_map_to = check_maps_to(adj1, 1, n)))
+    {
+        cout << "NO\n" << 1 << " " << no_map_to << "\n"; 
+    }
+    cout << "YES\n";
 }
 
-int32_t main(){
+int32_t main()
+{
     ios::sync_with_stdio(0); cin.tie(0);
     solve();
 }
