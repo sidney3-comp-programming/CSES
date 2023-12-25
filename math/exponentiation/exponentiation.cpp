@@ -1,11 +1,4 @@
 #include <bits/stdc++.h>
-using namespace std;
-
-typedef long long ll;
-typedef vector<int> vi;
-typedef pair<int, int> ii;
-typedef vector<pair<int,int>> vii;
-
 #define REP(i,a,b) for(int i = a; i < b; i++)
 #define pb push_back
 #define mp make_pair
@@ -17,25 +10,34 @@ typedef vector<pair<int,int>> vii;
 #define put(x) cout << x << " ";
 #define debug(x) cout << #x << ": " << x << endl;
 #define int long long int
-static constexpr int MOD = (int) 1e9 + 7;
+using namespace std;
 
-int exp(int a, int b){
-    if(b == 0){
+typedef long long ll;
+typedef vector<int> vi;
+typedef pair<int, int> ii;
+typedef vector<pair<int,int>> vii;
+
+static constexpr ll md = (ll) 1e9 + 7;
+
+ll exp(ll x, ll p, ll md)
+{
+    if(p == 0)
+    {
         return 1;
     }
-    if(b&1){
-        return a*exp(a, b-1) % MOD;
+    if(p & 1)
+    {
+        return (x*exp(x,p-1, md))%md;
     }
-    else{
-        int res =  exp(a, b / 2) % MOD;
-        return res*res % MOD;
-    }
+    ll res = exp(x,p/2,md);
+    return (res*res)%md;
 }
 
 void solve(){
-    int a,b,c;
+    ll a,b,c;
     cin >> a >> b >> c;
-    cout << exp(a,exp(b,c)) << endl;
+    ll p = exp(b,c,md-1);
+    putl(exp(a,p,md));
 }
 
 int32_t main(){
